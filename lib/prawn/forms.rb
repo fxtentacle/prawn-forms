@@ -19,6 +19,50 @@ module Prawn
 
     end
 
+    def checkbox(name, x, y, w, h, opts = {})
+      ref_on = ref!(
+          Type: :XObject,
+          Subtype: :Form,
+          BBox: [0,0,w,h]
+      )
+      ref_off = ref!(
+          Type: :XObject,
+          Subtype: :Form,
+          BBox: [0,0,w,h]
+      )
+
+      state.page.stamp_stream(ref_on) do
+        fill_color '000000'
+        renderer.add_content("0 0 #{w} #{h} re")
+        fill
+      end
+      state.page.stamp_stream(ref_off) do
+        renderer.add_content("0 0 #{w} #{h} re")
+        stroke
+      end
+      
+      x, y = map_to_absolute(x, y)
+
+      field_dict = {:T => PDF::Core::LiteralString.new(name),
+                    :DA => PDF::Core::LiteralString.new("/Helv 0 Tf 0 g"),
+                    :F => 4,
+                    :BS => {:W => 1, :S => :S},
+                    :MK => {:CA => PDF::Core::LiteralString.new('8'), :BC => [0, 0, 0]},
+                    :Rect => [x, y, x + w, y - h],
+                    :AS => :Off, :V => :Off,
+                    :AP => {:N => {:On => ref_on, :Off => ref_off}}
+      }
+
+      if opts[:default] != nil
+        if opts[:default]
+          field_dict[:V] = :On
+          field_dict[:AS] = :On
+        end
+      end
+
+      add_interactive_field(:Btn, field_dict)
+    end
+
     def text_field(name, x, y, w, h, opts = {})
       x, y = map_to_absolute(x, y)
 

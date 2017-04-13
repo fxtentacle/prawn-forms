@@ -15,4 +15,7 @@ Prawn::Document.generate "text_field.pdf" do |pdf|
   pdf.draw_text("Last Name:", :at => [30, 560], :size => 12)
   pdf.text_field("lname", 100, 560+12, 200, 16)
 
+  pdf.draw_text("Subscribe:", :at => [30, 520], :size => 12)
+  pdf.checkbox("subscribe", 100, 520+12, 16, 16, :default => true)
+
 end
